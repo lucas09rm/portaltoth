@@ -23,10 +23,10 @@ return new class extends Migration
             $table->string("username")->unique();
             $table->string("telefone");
             $table->string("cep");
+            $table->string("imagem");
             $table->boolean("ativo");
             $table->rememberToken();
             $table->timestamps();
-            //imagem
         });
     }
 

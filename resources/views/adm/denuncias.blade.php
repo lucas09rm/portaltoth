@@ -1,19 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Painel ADM - Toth</title>
+@extends('adm.layouts.appAdm')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+@section('content')
+<div class="container">
+<div class="row justify-content-center">
+        <div class="col-md-10">
 
-</head>
-<body>
-    Denuncias
+            @if (session('mensagem'))
+                <div class="alert alert-success alert-dismissible fade show my-3" role="alert">
+                    <strong>Alerta:</strong> {{ session('mensagem') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            @if (session('falha'))
+                <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                    <strong>Alerta:</strong> {{ session('falha') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
-</body>
-</html>
+            <div class="card">
+                <div class="card-header text-center">
+                    <i class="fa-solid fa-house"></i> {{ Auth::user()->name }} 
+                    <i class="fa-solid fa-user ms-2"></i> @_{{ Auth::user()->username }} 
+                    <i class="fa-solid fa-envelope ms-2"></i> {{ Auth::user()->email }}
+                </div>
+                <div class="card-body">
+                    @if (session('status'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <img src="{{ asset('img/perfil.png')}}" alt="..." width="60px" class="rounded-circle">
+                        </div>
+                        <div class="col-md-5 text-end">
+                            <a class="btn btn-light" href="{{ route('admin.painel') }}" role="button">Informações</a>
+                            <a class="btn btn-light" href="{{ route('admin.denuncias') }}" role="button">Denuncias</a>
+                        </div>
+                        <div class="col-md-5 text-end">
+                            <a class="btn btn-primary" href="{{ route('feed.createInfo') }}" role="button">Nova Informação</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center my-4">
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="mx-4">Denúncias</h2>
+                </div>
+                <div class="col-md-6">
+                    
+                    <div class="row">
+                        <div class="col-auto">
+                            <form class="form-inline" action="{{ route('admin.pesquisa.denuncia') }}" method="post">
+                                @csrf
+                                @method('GET')
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control @error('pesquisa') is-invalid @enderror" 
+                                            id="pesquisa" name="pesquisa" placeholder="Pesquisar Post" value="@empty($pesquisa)@else{{$pesquisa}}@endempty">
+                                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="filtro" class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <i class="fa-solid fa-filter"></i> Filtro
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="filtro">
+                                <a class="dropdown-item" href="">
+                                    Apenas Hoje
+                                </a>
+
+                                <a class="dropdown-item" href="">
+                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                        Data Espeficíca
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col">
+                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" name="data-moradia" value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                            </div>
+                                            <div class="col">
+                                                <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </a>
+                            </div>
+                        </div>                            
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center my-4">
+        <div class="col-md-8">
+            @if(count($denuncias) > 0)
+                @foreach($denuncias as $denuncia)
+                <div class="card border-light mb-3">
+                    <div class="card-header">
+                    {{$denuncia->id}}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-center">{{$denuncia->titulo}}</h5>
+                        <p class="card-text mx-3">{{$denuncia->texto}}</p>
+                    </div>
+                </div>
+
+                @endforeach
+            @endif
+            @if(count($denuncias) == 0)
+                <div class="alert alert-info my-3">
+                    Não há postagens denunciadas
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection

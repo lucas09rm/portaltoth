@@ -26,7 +26,8 @@ class User extends Authenticatable
         'cep',
         'endereco',
         'ativo',
-        'telefone'
+        'telefone',
+        'imagem',
     ];
 
     /**

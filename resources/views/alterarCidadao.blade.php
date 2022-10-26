@@ -4,6 +4,14 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            @if (session('mensagem'))
+                <div class="alert alert-success alert-dismissible fade show my-3" role="alert">
+                    <strong>Alerta:</strong> {{ session('mensagem') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
             @if (session('falha'))
                 <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
                     <strong>Alerta:</strong> {{ session('falha') }}
@@ -12,75 +20,21 @@
                     </button>
                 </div>
             @endif
-
             <div class="card">
-                <div class="card-header">Cadastro de Usúario</div>
+                <div class="card-header text-center">Alterar Usúario - Cidadão</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ route('update.cidadao') }}">
                         @csrf
-
-                        <div class="row mb-3">
-                            <label for="funcao" class="col-md-4 col-form-label text-md-end">Tipo de Perfil</label>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input @error('funcao') is-invalid @enderror" type="radio" name="funcao" id="funcao" 
-                                            value="cid" onClick="habilitarCid()" checked  autofocus>
-                                        <label class="form-check-label" for="cid">Cidadão</label>
-                                    </div>
-
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input @error('funcao') is-invalid @enderror" type="radio" name="funcao" id="funcao" 
-                                            value="emp" onClick="habilitarEmp()">
-                                        <label class="form-check-label" for="emp">Empresa</label>
-                                    </div>
-                                </div>
-                                @error('funcao')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
+                        @method('PATCH')
                         <div class="row mb-3">
                             <label for="name" class="col-md-4 col-form-label text-md-end">Nome Completo</label>
 
                             <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name">
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
+                                    value="{{ old('name') == '' ? (Auth::user()->name) : old('name')}}" autocomplete="name">
 
                                 @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">Email</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="username" class="col-md-4 col-form-label text-md-end">Username</label>
-
-                            <div class="col-md-6">
-                                <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" 
-                                    value="{{ old('username') }}" required autocomplete="username">
-
-                                @error('username')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -93,7 +47,7 @@
 
                             <div class="col-md-6">
                                 <input id="telefone" type="text" class="form-control @error('telefone') is-invalid @enderror" name="telefone" 
-                                    value="{{ old('telefone') }}" required autocomplete="telefone">
+                                value="{{ old('telefone') == '' ? (Auth::user()->telefone) : old('telefone')}}" autocomplete="telefone">
 
                                 @error('telefone')
                                     <span class="invalid-feedback" role="alert">
@@ -107,79 +61,10 @@
                             <label for="cep" class="col-md-4 col-form-label text-md-end">CEP</label>
 
                             <div class="col-md-6">
-                                <input id="cep" type="text" class="form-control @error('cep') is-invalid @enderror" name="cep" value="{{ old('cep') }}" required autocomplete="cep">
+                                <input id="cep" type="text" class="form-control @error('cep') is-invalid @enderror" name="cep" 
+                                value="{{ old('cep') == '' ? (Auth::user()->cep) : old('cep')}}" autocomplete="cep">
 
                                 @error('cep')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                       <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">Senha</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">Confirmar Senha</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-<!-- Empresa -->
-                        <div class="row mb-3" id="dataInau" style="display:none">
-                            <label for="data-inauguracao" class="col-md-4 col-form-label text-md-end">Data Inauguração</label>
-
-                            <div class="col-md-6">
-
-                                <input id="data-inauguracao" type="date" class="form-control @error('data-inauguracao') is-invalid @enderror" name="data-inauguracao" 
-                                    value="{{ old('data-moradia') == '' ? '2000-01-01': old('data-moradia')}}" autocomplete="data-inauguracao">
-
-                                @error('data-inauguracao')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3" id="chegouRegiao" style="display:none">
-                            <label for="chegou-regiao" class="col-md-4 col-form-label text-md-end">Chegou na região em</label>
-
-                            <div class="col-md-6">
-
-                                <input id="chegou-regiao" type="date" class="form-control @error('chegou-regiao') is-invalid @enderror" name="chegou-regiao" 
-                                    value="{{ old('chegou-regiao') == '' ? '2000-01-01': old('chegou-regiao')}}" autocomplete="chegou-regiao">
-
-                                @error('chegou-regiao')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3" id="resumoEmp" style="display:none">
-                            <label for="resumo" class="col-md-4 col-form-label text-md-end">Resumo Profissional</label>
-
-                            <div class="col-md-6">
-                                <textarea id="resumo" class="form-control @error('resumo') is-invalid @enderror" name="resumo"
-                                    rows="12" maxlength="400" autocomplete="resumo">{{ old('resumo') }}</textarea>
-
-                                @error('resumo')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -194,7 +79,7 @@
                             <div class="col-md-6">
 
                                 <input id="morador-desde" type="date" class="form-control @error('morador-desde') is-invalid @enderror" name="morador-desde" 
-                                    value="{{ old('morador-desde') == '' ? '2000-01-01': old('morador-desde')}}" autocomplete="morador-desde">
+                                    value="{{ old('morador-desde') == '' ? $cidadao->data_moradia : old('morador-desde')}}" autocomplete="morador-desde">
 
                                 @error('morador-desde')
                                     <span class="invalid-feedback" role="alert">
@@ -210,7 +95,7 @@
                             <div class="col-md-6">
 
                                 <input id="data-nasc" type="date" class="form-control @error('data-nasc') is-invalid @enderror" name="data-nasc" 
-                                    value="{{ old('data-nasc') == '' ? '2000-01-01': old('data-nasc')}}" autocomplete="data-nasc">
+                                value="{{ old('data-nasc') == '' ? $cidadao->data_nascimento : old('data-nasc')}}" autocomplete="data-nasc">
 
                                 @error('data-nasc')
                                     <span class="invalid-feedback" role="alert">
@@ -271,7 +156,7 @@
 
                             <div class="col-md-6">
                                 <input id="profissao" type="text" class="form-control @error('profissao') is-invalid @enderror" name="profissao" 
-                                    value="{{ old('profissao') }}" autocomplete="profissao">
+                                value="{{ old('profissao') == '' ? $perfil->profissao : old('profissao')}}" autocomplete="profissao">
 
                                 @error('profissao')
                                     <span class="invalid-feedback" role="alert">
@@ -286,7 +171,7 @@
 
                             <div class="col-md-6">
                                 <input id="area" type="text" class="form-control @error('area') is-invalid @enderror" name="area" 
-                                    value="{{ old('area') }}" autocomplete="area">
+                                value="{{ old('area') == '' ? $perfil->area : old('area')}}" autocomplete="area">
 
                                 @error('area')
                                     <span class="invalid-feedback" role="alert">
@@ -301,7 +186,7 @@
 
                             <div class="col-md-6">
                                 <input id="escolaridade" type="text" class="form-control @error('escolaridade') is-invalid @enderror" name="escolaridade" 
-                                    value="{{ old('escolaridade') }}" autocomplete="escolaridade">
+                                value="{{ old('escolaridade') == '' ? $perfil->escolaridade : old('escolaridade')}}" autocomplete="escolaridade">
 
                                 @error('escolaridade')
                                     <span class="invalid-feedback" role="alert">
@@ -315,8 +200,8 @@
                             <label for="resumo-cid" class="col-md-4 col-form-label text-md-end">Resumo Profissional</label>
 
                             <div class="col-md-6">
-                                <textarea id="resumo-cid" class="form-control @error('resumo-cid') is-invalid @enderror" name="resumo-cid" 
-                                    autocomplete="resumo-cid" rows="12" maxlength="800">{{ old('resumo-cid') }}</textarea>
+                                <textarea id="resumo-cid" class="form-control @error('resumo-cid') is-invalid @enderror" name="resumo-cid" autocomplete="resumo-cid" 
+                                    rows="12" maxlength="800">{{ old('resumo-cid') == '' ? $perfil->texto : old('resumo-cid')}}</textarea>
 
                                 @error('resumo-cid')
                                     <span class="invalid-feedback" role="alert">
@@ -346,53 +231,41 @@
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Cadastrar
-                                </button>
+                            <div class="col-md-6 offset-md-4 my-3   ">
+                                <a class="btn btn-danger" data-bs-toggle="modal" href="#confirmarAlteracao" role="button">
+                                    Alterar Perfil
+                                </a>
                             </div>
                         </div>
+
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="confirmarAlteracao" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="title"><strong>Alterar perfil?</strong></h5> 
+
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Ao confirmar a  <strong>alteração</strong> o perfil será alterado sem haver a possibilidade de voltar atras. 
+                                    </div>
+                                    <div class="modal-footer">
+                                        
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-danger">Alterar Perfil</button>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    function habilitarCid() {
-        document.getElementById("morador").style.display = '';
-        document.getElementById("dataNasc").style.display = '';
-        document.getElementById("estadoCivil").style.display = '';
-        document.getElementById("sexoUsuario").style.display = '';
-        document.getElementById("resumoCid").style.display = '';
-        document.getElementById("perfil").style.display = '';
-        document.getElementById("perfil-profissao").style.display = '';
-        document.getElementById("areaInteresse").style.display = '';
-        document.getElementById("escola").style.display = '';
-        document.getElementById("perfilStatus").style.display = '';
-
-        document.getElementById("resumoEmp").style.display = 'none';
-        document.getElementById("chegouRegiao").style.display = 'none';
-        document.getElementById("dataInau").style.display = 'none';
-    }
-
-    function habilitarEmp() {
-        document.getElementById("morador").style.display = 'none';
-        document.getElementById("dataNasc").style.display = 'none';
-        document.getElementById("estadoCivil").style.display = 'none';
-        document.getElementById("sexoUsuario").style.display = 'none';
-        document.getElementById("resumoCid").style.display = 'none';
-        document.getElementById("perfil").style.display = 'none';
-        document.getElementById("perfil-profissao").style.display = 'none';
-        document.getElementById("areaInteresse").style.display = 'none';
-        document.getElementById("escola").style.display = 'none';
-        document.getElementById("perfilStatus").style.display = 'none';
-
-        document.getElementById("resumoEmp").style.display = '';
-        document.getElementById("chegouRegiao").style.display = '';
-        document.getElementById("dataInau").style.display = '';
-    }
-</script>
 
 @endsection
