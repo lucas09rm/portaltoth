@@ -44,18 +44,26 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="filtro">
-                                <a class="dropdown-item" href="">
-                                    Apenas Hoje
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('post.data') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="hoje">
+                                        <input type="hidden" id="filtro" name="filtro" value="@empty($filtro)@else{{$filtro}}@endempty">
+                                        
+                                        <button class="btn btn-light" type="submit">Apenas Hoje</button>
+                                    </form>
                                 </a>
 
-                                <a class="dropdown-item" href="">
-                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('post.data') }}" method="post">
                                         Data Espeficíca
                                         @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="data">
+                                        <input type="hidden" id="filtro" name="filtro" value="@empty($filtro)@else{{$filtro}}@endempty">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" 
-                                                    name="data-moradia" value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                                <input id="data" type="date" class="form-control mb-2 @error('data') is-invalid @enderror" 
+                                                    name="data" value="{{ old('data') }}" autocomplete="data">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>
@@ -71,6 +79,22 @@
 
             <div class="row justify-content-center my-4">
                 <div class="col-md-10">
+                    @if (session('mensagem'))
+                        <div class="alert alert-success alert-dismissible fade show my-3" role="alert">
+                            <strong>Alerta:</strong> {{ session('mensagem') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+                    @if (session('falha'))
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            <strong>Alerta:</strong> {{ session('falha') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
                     @if(count($posts) > 0)
                         @foreach($posts as $post)
                         <div class="card mb-3">
@@ -86,7 +110,7 @@
                                             </div>
                                             <div class="col-6 text-end">
                                                 <span class="badge bg-secondary">{{$post->tag}}</span>
-                                                @if(Auth::user()->funcao == 'cid')
+                                                @if(Auth::user()->funcao == 'cid' && Auth::user()->id != $post->user_id)
                                                 <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarDenuncia" data-bs-whatever="{{$post->id}}" 
                                                     data-bs-toggle="tooltip" data-bs-placement="top" title="Denunciar Postagem">
                                                     <i class="fa-solid fa-triangle-exclamation"></i>
@@ -118,7 +142,6 @@
                                 </div>
                             </div>
                         </div>
-
                         @endforeach
                     @endif
                     @if(count($posts) == 0)
@@ -142,14 +165,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Ao confirmar a  <strong>denuncia</strong> a postagem será enviada para equipe de denuncias. 
+                Ao confirmar a  <strong>denuncia</strong> a postagem será enviada para avaliação de conteúdo desrespeitoso, impróprio ou falso.
             </div>
             <div class="modal-footer">
-                <form>
-                    <input type="hidden" id="denunciaId">
+                <form method="POST" action="{{ route('denunciar.post') }}">
+                    @csrf
+                    <input type="hidden" id="postId" name="postId">
 
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger">Denunciar</button>
+                    <button type="submit" class="btn btn-danger">Denunciar</button>
                 </form>
             </div>
         </div>
@@ -166,9 +190,9 @@
             var button = event.relatedTarget;
             var info = button.getAttribute('data-bs-whatever');
 
-            var modalFooterInput = exampleModal.querySelector('.modal-footer input');
+            var denunciaPost = document.getElementById('postId');
 
-            modalFooterInput.value = info;
+            denunciaPost.value = info;
         });
     </script>
 @endsection

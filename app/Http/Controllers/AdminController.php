@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Administrador;
 use App\Models\Informacao;
 use App\Models\Denuncia;
+use App\Models\Postagem;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -22,10 +23,27 @@ class AdminController extends Controller
             ->join('users', 'users.id', '=', 'informacaos.user_id')
             ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
             ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
+            ->orderBy('informacaos.created_at', 'asc')
             ->get();
 
         return view('adm.painel', compact('infos'));
     }
+
+    public function denuncias(){
+        
+        $denuncias = DB::table('postagems')
+        ->join('users', 'users.id', '=', 'postagems.user_id')
+        ->join('denuncias', 'denuncias.postagem_id', '=', 'postagems.id')
+        ->join('tags', 'tags.id', '=', 'postagems.tag_id')
+        ->select('postagems.*', 'denuncias.created_at as data_denuncia', 'users.name as usuario', 
+                'users.email as email', 'users.username as username', 'tags.nome as tag')
+        ->where('denuncias.ativo', 1)
+        ->orderBy('denuncias.created_at', 'asc')
+        ->get();
+
+        return view('adm.denuncias', compact('denuncias'));
+    }
+
 
     public function create()
     {
@@ -80,22 +98,7 @@ class AdminController extends Controller
         }
     }
 
-    public function denuncias()
-    {
-        /*
-        $denuncias = DB::table('postagems')
-        ->join('denuncias', function ($join) {
-            $join->on('postagems.id', '=', 'denuncias.user_id')
-                 ->where('denuncias.user_id', '>', 5);
-        })
-        ->get();
-
-        */
-        $denuncias = Denuncia::all();
-
-        return view('adm.denuncias', compact('denuncias'));
-    }
-
+    
     public function edit()
     {
         $admin = Administrador::find(Auth::user()->id);
@@ -154,7 +157,6 @@ class AdminController extends Controller
 
     public function updateSenha(Request $request){
 
-
         $validator = Validator::make($request->all(), [
             'senha-atual' => ['required', 'string', 'min:8'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -173,12 +175,12 @@ class AdminController extends Controller
                 if(isset($user)){
                     $user->password = Hash::make($request->input('password'));
                     $user->save();
+                    DB::commit();
                 }                
                 else{
+                    DB::commit();
                     return redirect("/perfil")->with('falha', "Usuário não encontrado")->withInput();
                 }
-
-                DB::commit();
     
                 return redirect("/perfil")->with('mensagem', "Senha alterada com sucesso")->withInput();
     
@@ -193,8 +195,49 @@ class AdminController extends Controller
         
     }
 
-    public function destroy($id)
+    public function analiseDenuncia(Request $request)
     {
-        //
+        if(isset($_POST["excluirPost"])){
+            try{            
+                $post = Postagem::find($request->input('postId'));
+    
+                if (isset($post)) {
+                    DB::beginTransaction();
+                    $denuncia = DB::table('denuncias')->where('postagem_id', $request->input('postId'))->get();
+    
+                    if(isset($denuncia))  DB::table('denuncias')->where('postagem_id', $request->input('postId'))->delete();
+    
+                    $post->delete();
+    
+                    DB::commit();
+    
+                    return redirect()->route('admin.denuncias')->with('mensagem', "Postagem excluida com sucesso")->withInput();
+                }
+                else{
+                    return redirect()->route('admin.denuncias')->with("falha", "Postagem não encontrada")->withInput();
+                }
+            }
+            catch(\Illuminate\Database\QueryException $e) { 
+    
+                DB::rollBack();
+                return redirect()->route('admin.denuncias')->with("falha", "Erro ao excluir postagem.")->withInput();
+            }
+        }
+        else if(isset($_POST["excluirDenuncia"])){
+            try{
+                DB::beginTransaction();
+                  
+                DB::table('denuncias')->where('postagem_id', $request->input('postId'))->delete();
+                
+                DB::commit();
+    
+                return redirect()->route('admin.denuncias')->with('mensagem', "Denúncia excluida com sucesso")->withInput();            
+            }
+            catch(\Illuminate\Database\QueryException $e) { 
+    
+                DB::rollBack();
+                return redirect()->route('admin.denuncias')->with("falha", "Erro ao excluir denúncia.")->withInput();
+            }
+        }
     }
 }

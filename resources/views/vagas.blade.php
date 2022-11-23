@@ -42,18 +42,26 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="filtro">
-                                <a class="dropdown-item" href="">
-                                    Apenas Hoje
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('vaga.data') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="hoje">
+                                        <input type="hidden" id="filtro" name="filtro" value="@empty($filtro)@else{{$filtro}}@endempty">
+                                        
+                                        <button class="btn btn-light" type="submit">Apenas Hoje</button>
+                                    </form>
                                 </a>
 
-                                <a class="dropdown-item" href="">
-                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('vaga.data') }}" method="post">
                                         Data Espeficíca
                                         @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="data">
+                                        <input type="hidden" id="filtro" name="filtro" value="@empty($filtro)@else{{$filtro}}@endempty">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" 
-                                                    name="data-moradia" value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                                <input id="data" type="date" class="form-control mb-2 @error('data') is-invalid @enderror" 
+                                                    name="data" value="{{ old('data') }}" autocomplete="data">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>
@@ -62,7 +70,7 @@
                                     </form>
                                 </a>
                             </div>
-                        </div>                        
+                        </div>                    
                     </d iv>  
                 </div>
 
@@ -70,6 +78,22 @@
 
             <div class="row justify-content-center my-4">
                 <div class="col-md-10">
+                    @if (session('mensagem'))
+                        <div class="alert alert-success alert-dismissible fade show my-3" role="alert">
+                            <strong>Alerta:</strong> {{ session('mensagem') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+                    @if (session('falha'))
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            <strong>Alerta:</strong> {{ session('falha') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
                     @if(count($vagas) > 0)
                         @foreach($vagas as $vaga)
                             <div class="card mb-3">

@@ -39,10 +39,10 @@
                         @guest
                         @else
                             <li class="nav-item">
-                                <a class="nav-link " href="{{ route('admin.create') }}">Novo Admin</a>
+                                <strong><a class="nav-link " href="{{ route('admin.create') }}">Novo Admin</a></strong>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link " href="{{ route('admin.edit') }}">Alterar Admin</a>
+                                <strong><a class="nav-link " href="{{ route('admin.edit') }}">Alterar Admin</a></strong>
                             </li>
                         @endguest
                     </ul>
@@ -53,20 +53,21 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">Login</a>
+                                    <strong><a class="nav-link" href="{{ route('login') }}">Login</a></strong>
                                 </li>
                             @endif
 
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.create') }}">Cadastrar-se</a>
+                                    <strong><a class="nav-link" href="{{ route('admin.create') }}">Cadastrar-se</a></strong>
                                 </li>
                             @endif
                         @else
                             <li class="nav-item">
-                                    <a class="nav-link" href="{{ url()->previous() }}">Voltar</a>
+                                <strong><a class="nav-link" href="{{ url()->previous() }}">Voltar</a></strong>
                             </li>
                             <li class="nav-item dropdown">
+                                <strong>
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
                                 </a>
@@ -89,13 +90,14 @@
                                     </form>
 
                                 </div>
+                                </strong>
                             </li>
                         @endguest
                     </ul>
                 </div>
             </div>
         </nav>
-
+        
         <main class="py-4">
             @yield('content')
         </main>

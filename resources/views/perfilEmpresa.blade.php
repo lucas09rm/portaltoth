@@ -95,24 +95,36 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 mb-3">
                             <a id="filtro" class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 <i class="fa-solid fa-filter"></i> Filtro
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="filtro">
-                                <a class="dropdown-item" href="">
-                                    Apenas Hoje
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil') }}" method="GET">
+                                        @csrf
+                                        <button class="btn btn-light" type="submit">Todas</button>
+                                    </form>
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil.data') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="hoje">
+                                        
+                                        <button class="btn btn-light" type="submit">Apenas Hoje</button>
+                                    </form>
                                 </a>
 
-                                <a class="dropdown-item" href="">
-                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil.data') }}" method="post">
                                         Data Espeficíca
                                         @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="data">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" name="data-moradia" 
-                                                    value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                                <input id="data" type="date" class="form-control mb-2 @error('data') is-invalid @enderror" 
+                                                    name="data" value="{{ old('data') }}" autocomplete="data">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>

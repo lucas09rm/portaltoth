@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Informacao;
 use App\Models\Postagem;
 use App\Models\Vaga;
+use App\Models\Denuncia;
 
 class FeedController extends Controller
 {
@@ -53,7 +54,7 @@ class FeedController extends Controller
             $retorno = $post->save();
 
             DB::commit();
-            return redirect('/perfil')->with('mensagem', "Postagem cadastrada com sucesso")->withInput();
+            return redirect()->back()->with('mensagem', "Postagem cadastrada com sucesso")->withInput();
 
         } catch(\Illuminate\Database\QueryException $e) {
             
@@ -68,20 +69,66 @@ class FeedController extends Controller
             $post = Postagem::find($request->input('postId'));
 
             if (isset($post)) {
-                Storage::delete('/storage/'+$post->imagem);
-                $post->delete();
 
-                return redirect("/perfil")->with('mensagem', "Postagem excluida com sucesso")->withInput();
+                DB::beginTransaction();
+
+                $denuncia = DB::table('denuncias')->where('postagem_id', $request->input('postId'))->get();
+
+                if (isset($denuncia)) DB::table('denuncias')->where('postagem_id', $request->input('postId'))->delete();
+
+                $post->delete(); 
+                
+                DB::commit();
+                
+                return redirect()->route('perfil')->with('mensagem', "Postagem excluida com sucesso")->withInput();
             }
             else{
-                return redirect("/perfil")->with("falha", "Postagem não encontrada")->withInput();
+                return redirect()->route('perfil')->with("falha", "Postagem não encontrada")->withInput();
             }
         }
         catch(\Illuminate\Database\QueryException $e) {
-            
-            return redirect("/perfil")->with("falha", "Erro ao excluir postagem.")->withInput();
+            DB::rollBack();
+            return redirect()->route('perfil')->with("falha", "Erro ao excluir postagem.")->withInput();
         }
         
+    }
+
+    public function denunciarPost(Request $request){
+        try{
+            $denuncia = DB::table('denuncias')->where('postagem_id', $request->input('postId'))->first();
+           
+            if(!isset($denuncia)){
+                $post = Postagem::find($request->input('postId'));
+                
+                if (isset($post)) {
+
+                    DB::beginTransaction();
+
+                    $denuncia = new Denuncia();
+                    $denuncia->ativo = true;
+                    $denuncia->analise = "Nao-avaliada";
+                    $denuncia->postagem_id = $request->input('postId');
+                    $denuncia->user_id = Auth::user()->id;
+        
+                    $retorno = $denuncia->save();
+
+                    DB::commit();
+
+                    return redirect()->back()->with('mensagem', "Postagem denunciada com sucesso")->withInput();
+                }
+                else{
+                    return redirect()->back()->with("falha", "Postagem não encontrada")->withInput();
+                }
+                
+            }else{
+                return redirect()->back()->with("mensagem", "Postagem já possui denúncia em análise")->withInput();
+            }
+                                
+        }
+        catch(\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return redirect()->back()->with("falha", "Erro ao denunciar postagem.")->withInput();
+        }
     }
 
     //VAGAS
@@ -117,7 +164,7 @@ class FeedController extends Controller
             $retorno = $vaga->save();
 
             DB::commit();
-            return redirect('/perfil')->with('mensagem', "Vaga cadastrada com sucesso")->withInput();
+            return redirect()->route('perfil')->with('mensagem', "Vaga cadastrada com sucesso")->withInput();
 
         } catch(\Illuminate\Database\QueryException $e) {
 
@@ -132,18 +179,22 @@ class FeedController extends Controller
             $vaga = Vaga::find($request->input('vagaId'));
 
             if (isset($vaga)) {
+                DB::beginTransaction();
+
                 Storage::delete('storage/'.$vaga->imagem);
                 $vaga->delete();
 
-                return redirect("/perfil")->with('mensagem', "Vaga excluida com sucesso")->withInput();
+                DB::commit();
+
+                return redirect()->route('perfil')->with('mensagem', "Vaga excluida com sucesso")->withInput();
             }
             else{
-                return redirect("/perfil")->with("falha", "Vaga não encontrada")->withInput();
+                return redirect()->route('perfil')->with("falha", "Vaga não encontrada")->withInput();
             }
         }
         catch(\Illuminate\Database\QueryException $e) {
-            
-            return redirect("/perfil")->with("falha", "Erro ao excluir vaga.")->withInput();
+            DB::rollBack();
+            return redirect()->route('perfil')->with("falha", "Erro ao excluir vaga.")->withInput();
         }
         
     }
@@ -185,7 +236,8 @@ class FeedController extends Controller
             $retorno = $info->save();
 
             DB::commit();
-            return redirect("/admin")->with('mensagem', "Informação cadastrada com sucesso")->withInput();
+           
+            return redirect()->route('admin.painel')->with('mensagem', "Informação cadastrada com sucesso")->withInput();
 
         } catch(\Illuminate\Database\QueryException $e) {
             DB::rollBack();
@@ -199,18 +251,23 @@ class FeedController extends Controller
             $info = Informacao::find($request->input('infoId'));
 
             if (isset($info)) {
+
+                DB::beginTransaction();
+
                 Storage::delete('storage/'.$info->imagem);
                 $info->delete();
 
-                return redirect("/admin")->with('mensagem', "Informação excluida com sucesso")->withInput();
+                DB::commit();
+
+                return redirect()->route('admin.painel')->with('mensagem', "Informação excluida com sucesso")->withInput();
             }
             else{
-                return redirect("/admin")->with("falha", "Informação não encontrada")->withInput();
+                return redirect()->route('admin.painel')->with("falha", "Informação não encontrada")->withInput();
             }
         }
         catch(\Illuminate\Database\QueryException $e) {
-            
-            return redirect("/admin")->with("falha", "Erro ao excluir informação.")->withInput();
+            DB::rollBack();
+            return redirect()->route('admin.painel')->with("falha", "Erro ao excluir informação.")->withInput();
         }
         
     }

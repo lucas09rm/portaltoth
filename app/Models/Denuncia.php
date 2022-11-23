@@ -9,9 +9,10 @@ class Denuncia extends Model
 {
     protected $fillable = [
         'id',
-        'data_chegada',
-        'data_inauguracao',
-        'resumo',
+        'user_id',
+        'postagem_id',
+        'analise',
+        'ativo',
     ];
     
     use HasFactory;

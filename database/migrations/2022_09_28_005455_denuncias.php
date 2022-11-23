@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('denuncias', function (Blueprint $table) {
             $table->bigIncrements("id");
-
+            $table->string("analise")->nullable();
+            $table->boolean("ativo");
             $table->unsignedBigInteger("postagem_id");
             $table->foreign("postagem_id")->references("id")->on("postagems");
             $table->unsignedBigInteger("user_id");
             $table->foreign("user_id")->references("id")->on("users");
-
             $table->timestamps();
         });
     }

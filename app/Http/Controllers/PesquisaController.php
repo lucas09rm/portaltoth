@@ -13,144 +13,10 @@ use App\Models\Empresa;
 use App\Models\Cidadao;
 use App\Models\Vaga;
 
-class FiltroController extends Controller
+class PesquisaController extends Controller
 {
-    //Postagem
-    public function noticias( Request $request){
-
-        $posts = DB::table('postagems')
-        ->join('users', 'users.id', '=', 'postagems.user_id')
-        ->join('tags', 'tags.id', '=', 'postagems.tag_id')
-        ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-        ->where('tag_id', 2)
-        ->orderBy('postagems.created_at', 'asc')
-        ->get();
-
-        return view('home', compact('posts'), ['filtro'=> 'Noticias']);
-    }
-
-    public function eventos(){
-        
-        $posts = DB::table('postagems')
-            ->join('users', 'users.id', '=', 'postagems.user_id')
-            ->join('tags', 'tags.id', '=', 'postagems.tag_id')
-            ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 3)
-            ->orderBy('postagems.created_at', 'asc')
-            ->get();
-
-        return view('home', compact('posts'), ['filtro'=> 'Eventos']);
-    }
-
-    public function promocoes(){
-
-        $posts = DB::table('postagems')
-            ->join('users', 'users.id', '=', 'postagems.user_id')
-            ->join('tags', 'tags.id', '=', 'postagems.tag_id')
-            ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 4)
-            ->orderBy('postagems.created_at', 'asc')
-            ->get();
-
-        return view('home', compact('posts'), ['filtro'=> 'Promocões']);
-    }
-
-
-    public function inauguracoes(){
-        
-        $posts = DB::table('postagems')
-            ->join('users', 'users.id', '=', 'postagems.user_id')
-            ->join('tags', 'tags.id', '=', 'postagems.tag_id')
-            ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 5)
-            ->orderBy('postagems.created_at', 'asc')
-            ->get();
-
-        return view('home', compact('posts'), ['filtro'=> 'Inaugurações']);
-    }
-
-    //Informações
-    public function historia(){
-        
-        $infos = DB::table('informacaos')
-            ->join('users', 'users.id', '=', 'informacaos.user_id')
-            ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
-            ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 6)
-            ->orderBy('informacaos.created_at', 'asc')
-            ->get();
-
-        return view('informacoes', compact('infos'), ['filtro'=> 'História']);
-
-    }
-
-    public function voluntariar(){
-        
-        $infos = DB::table('informacaos')
-            ->join('users', 'users.id', '=', 'informacaos.user_id')
-            ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
-            ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 7)
-            ->orderBy('informacaos.created_at', 'asc')
-            ->get();
-
-        return view('informacoes', compact('infos'), ['filtro'=> 'Voluntariar-se']);
-    }
-
-    public function projetos(){
-
-        $infos = DB::table('informacaos')
-            ->join('users', 'users.id', '=', 'informacaos.user_id')
-            ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
-            ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 8)
-            ->orderBy('informacaos.created_at', 'asc')
-            ->get();
-
-        return view('informacoes', compact('infos'), ['filtro'=> 'Projetos']);
-    }
-
-
-    public function infosRegiao(){
-        
-        $infos = DB::table('informacaos')
-            ->join('users', 'users.id', '=', 'informacaos.user_id')
-            ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
-            ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id', 9)
-            ->orderBy('informacaos.created_at', 'asc')
-            ->get();
-
-        return view('informacoes', compact('infos'), ['filtro'=> 'Infos da Região']);
-    }
-
-    //Vagas
-
-    public function vagasAbertas(){
-        
-        $vagas = DB::table('vagas')
-            ->join('users', 'users.id', '=', 'vagas.user_id')
-            ->join('tags', 'tags.id', '=', 'vagas.tag_id')
-            ->select('vagas.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->orderBy('vagas.created_at', 'asc')
-            ->get();
-
-        return view('vagas', compact('vagas'));
-    }
-
-    public function candidatos(){
-        
-        $vagas = DB::table('perfil_profissionals')
-        ->join('users', 'users.id', '=', 'perfil_profissionals.user_id')
-        ->select('perfil_profissionals.*', 'users.name as usuario', 'users.email as email', 'users.telefone as telefone', 'users.username as username')
-        ->orderBy('vagas.created_at', 'asc')
-        ->get();
-
-        return view('vagas', compact('vagas'), ['filtro'=> 'Candidatos']);
-    }
-    /*
-    //PESQUISAS
-    public function pesquisaPost(Request $request){
+     //PESQUISAS
+     public function pesquisaPost(Request $request){
         $filtro = $request->input('filtro');
 
         if($filtro == "Noticias"){ $tag = [2]; $rota = "noticias";}
@@ -173,6 +39,7 @@ class FiltroController extends Controller
                 ->where('titulo', 'LIKE', '%'.$pesquisa.'%')
                 ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');})
             ->whereIn('tag_id', $tag)
+            ->orderBy('postagems.created_at', 'asc')
             ->get();
 
         return view('home', compact('posts'), ['filtro'=> $filtro, 'pesquisa' => $pesquisa]);
@@ -201,6 +68,7 @@ class FiltroController extends Controller
             ->where('titulo', 'LIKE', '%'.$pesquisa.'%')
             ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');})
         ->whereIn('tag_id', $tag)
+        ->orderBy('informacaos.created_at', 'asc')
         ->get();
 
         return view('informacoes', compact('infos'), ['filtro'=> $filtro, 'pesquisa' => $pesquisa]);
@@ -235,6 +103,7 @@ class FiltroController extends Controller
                     ->orWhere('titulo', 'LIKE', '%'.$pesquisa.'%')
                     ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%')
                     ->orWhere('area', 'LIKE', '%'.$pesquisa.'%');})
+                ->orderBy('vagas.created_at', 'asc')            
                 ->get();
         }
 
@@ -261,6 +130,7 @@ class FiltroController extends Controller
                     ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%')
                     ->orWhere('area', 'LIKE', '%'.$pesquisa.'%');})
                 ->where('user_id', Auth::user()->id)
+                ->orderBy('vagas.created_at', 'asc')
                 ->get();
 
             return view('perfilEmpresa', compact('empresa', 'vagas', 'pesquisa' ));
@@ -277,6 +147,7 @@ class FiltroController extends Controller
                     ->where('titulo', 'LIKE', '%'.$pesquisa.'%')
                     ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');})
                 ->where('user_id', Auth::user()->id)
+                ->orderBy('postagems.created_at', 'asc')
                 ->get();
 
             return view('perfilCidadao', compact('cidadao', 'perfil', 'posts', 'pesquisa'));
@@ -296,7 +167,8 @@ class FiltroController extends Controller
         ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
         ->where( function($query) use ($pesquisa){ return $query 
             ->where('titulo', 'LIKE', '%'.$pesquisa.'%')
-            ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');})         
+            ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');})  
+        ->orderBy('informacaos.created_at', 'asc')       
         ->get();
     
         return view('adm.painel', compact('infos'), ['pesquisa' => $pesquisa]);
@@ -309,10 +181,20 @@ class FiltroController extends Controller
 
         $pesquisa = $request->input('pesquisa');
 
-        $denuncias = Denuncia::all();
+        $denuncias = DB::table('postagems')
+        ->join('users', 'users.id', '=', 'postagems.user_id')
+        ->join('denuncias', 'denuncias.postagem_id', '=', 'postagems.id')
+        ->join('tags', 'tags.id', '=', 'postagems.tag_id')
+        ->select('postagems.*', 'denuncias.created_at as data_denuncia', 'users.name as usuario', 
+                'users.email as email', 'users.username as username', 'tags.nome as tag')
+        ->where( function($query) use ($pesquisa){ return $query 
+            ->where('titulo', 'LIKE', '%'.$pesquisa.'%')
+            ->orWhere('texto', 'LIKE', '%'.$pesquisa.'%');}) 
+        ->where('denuncias.ativo', 1)
+        ->orderBy('postagems.created_at', 'asc')
+        ->get();
 
         return view('adm.denuncias', compact('denuncias'));
     
     }
-    */
 }

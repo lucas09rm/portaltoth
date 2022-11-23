@@ -18,8 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger("user_id");
             $table->foreign("user_id")->references("id")->on("cidadaos");
             $table->unsignedBigInteger("tag_id");
-            $table->foreign("tag_id")->references("id")->on("tags");
-            
+            $table->foreign("tag_id")->references("id")->on("tags");            
         });
     }
 

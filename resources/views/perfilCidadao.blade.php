@@ -108,18 +108,31 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="filtro">
-                                <a class="dropdown-item" href="">
-                                    Apenas Hoje
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil') }}" method="GET">
+                                        @csrf
+                                        <button class="btn btn-light" type="submit">Todas</button>
+                                    </form>
                                 </a>
 
-                                <a class="dropdown-item" href="">
-                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil.data') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="hoje">
+                                        
+                                        <button class="btn btn-light" type="submit">Apenas Hoje</button>
+                                    </form>
+                                </a>
+
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('perfil.data') }}" method="post">
                                         Data Espeficíca
                                         @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="data">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" name="data-moradia" 
-                                                    value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                                <input id="data" type="date" class="form-control mb-2 @error('data') is-invalid @enderror" 
+                                                    name="data" value="{{ old('data') }}" autocomplete="data">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>
@@ -128,7 +141,7 @@
                                     </form>
                                 </a>
                             </div>
-                        </div>                        
+                        </div>                       
                     </div>                    
                 </div>
             </div>
@@ -204,7 +217,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Ao confirmar a  <strong>exclusão</strong> a postagem será deletada do portal sem haver a possibilidade de voltar atras. 
+                Ao confirmar a  <strong>exclusão</strong> a postagem será deletada do portal sem haver a possibilidade de voltar atrás. 
             </div>
             <div class="modal-footer">
                 <form method="POST" action="{{ route('destroy.post') }}">

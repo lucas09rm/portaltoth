@@ -74,23 +74,30 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 mb-3">
                             <a id="filtro" class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 <i class="fa-solid fa-filter"></i> Filtro
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="filtro">
-                                <a class="dropdown-item" href="">
-                                    Apenas Hoje
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('admin.denuncia.data') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="hoje">
+                                        
+                                        <button class="btn btn-light" type="submit">Apenas Hoje</button>
+                                    </form>
                                 </a>
 
-                                <a class="dropdown-item" href="">
-                                    <form class=" form-inline" id="logout-form" action="#" method="">
+                                <a class="dropdown-item" href="#">
+                                    <form class="form-inline" action="{{ route('admin.denuncia.data') }}" method="POST">
                                         Data Espeficíca
                                         @csrf
+                                        <input type="hidden" id="tipo" name="tipo" value="data">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="data-moradia" type="date" class="form-control mb-2 @error('data-moradia') is-invalid @enderror" name="data-moradia" value="{{ old('data-moradia') }}" autocomplete="data-moradia">
+                                                <input id="data" type="date" class="form-control mb-2 @error('data') is-invalid @enderror" 
+                                                    name="data" value="{{ old('data') }}" autocomplete="data">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary mx-auto">Pesquisar</button>
@@ -110,16 +117,50 @@
         <div class="col-md-8">
             @if(count($denuncias) > 0)
                 @foreach($denuncias as $denuncia)
-                <div class="card border-light mb-3">
+                <div class="card mb-3">
                     <div class="card-header">
-                    {{$denuncia->id}}
+                        <div class="row justify-content-center">
+                            <div class="col-2 text-center">
+                                <img src="{{ asset('img/perfil.png')}}" alt="..." width="55px" class="rounded-circle">
+                            </div>
+                            <div class="col-10">
+                                <div class="row justify-content-center">
+                                    <div class="col-6 text-start">
+                                        <strong>{{ $denuncia->usuario }}</strong> @_{{$denuncia->username}}
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <span class="badge bg-secondary">{{$denuncia->tag}}</span>
+                                        
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarAnalise" 
+                                            data-bs-whatever="{{$denuncia->id}}" data-bs-toggle="tooltip" data-bs-placement="top" title="Análise Denúncia">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>                      
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <h5><strong>{{$denuncia->titulo}}</strong></h5>
+                                    </div>
+                                </div>                                        
+                            </div>
+                        </div> 
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title text-center">{{$denuncia->titulo}}</h5>
-                        <p class="card-text mx-3">{{$denuncia->texto}}</p>
+                        <h5 class="card-title text-center"></h5>
+                        <p class="card-text mx-5">{{$denuncia->texto}}</p>
+                        @empty($denuncia->imagem)@else<img src="/storage/{{$denuncia->imagem}}" class="card-img ">@endempty
+                    </div>
+                    <div class="card-footer">
+                        <div class="row justify-content-center">
+                            <div class="col-6 text-start">
+                                Criado em: {{$denuncia->created_at}}
+                            </div>
+                            <div class="col-6 text-end">
+                                Denunciado em: {{$denuncia->data_denuncia}}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
                 @endforeach
             @endif
             @if(count($denuncias) == 0)
@@ -130,4 +171,47 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmarAnalise" tabindex="-1" aria-labelledby="confirmarAnalise" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title"><strong>Analise de denúncia</strong></h5> 
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Ao confirmar a  <strong>análise</strong> a postagem ou denuncia será excluida do portal sem haver a possibilidade de voltar atrás. 
+            </div>
+            <div class="modal-footer">
+                <form method="POST" action="{{ route('admin.analise.denuncia') }}">
+                    @csrf
+                    <input type="hidden" id="postId" name="postId">
+
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                    
+                    <input type="submit" class="btn btn-danger" name="excluirDenuncia" value="Excluir Denúncia">
+                    <input type="submit" class="btn btn-danger" name="excluirPost" value="Excluir Postagem">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+
+@section('javascript')
+    <script type="text/javascript">
+        var exampleModal = document.getElementById('confirmarAnalise');
+
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var info = button.getAttribute('data-bs-whatever');
+
+            var denunciaPost = document.getElementById('postId');
+
+            denunciaPost.value = info;
+        });
+    </script>
 @endsection

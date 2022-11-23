@@ -20,22 +20,18 @@ use App\Models\Vaga;
 class HomeController extends Controller
 {
     public function teste(){
-        $posts = DB::table('postagems')
-            ->join('users', 'users.id', '=', 'postagems.user_id')
-            ->join('tags', 'tags.id', '=', 'postagems.tag_id')
-            ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
-            ->where('tag_id',[ 3,4,5])
-            ->first();
+
+        $denuncias = DB::table('denuncias')->where('postagem_id', 4)->get();
         
-        dd($posts);
+        dd($denuncias);
     }
 
     public function index(){
-        //$posts = Postagem::all();
         $posts = DB::table('postagems')
             ->join('users', 'users.id', '=', 'postagems.user_id')
             ->join('tags', 'tags.id', '=', 'postagems.tag_id')
             ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
+            ->orderBy('postagems.created_at', 'asc')
             ->get();
 
         return view('home', compact('posts'));
@@ -46,6 +42,7 @@ class HomeController extends Controller
             ->join('users', 'users.id', '=', 'informacaos.user_id')
             ->join('tags', 'tags.id', '=', 'informacaos.tag_id')
             ->select('informacaos.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
+            ->orderBy('informacaos.created_at', 'asc')
             ->get();
 
         return view('informacoes', compact('infos'));
@@ -56,6 +53,7 @@ class HomeController extends Controller
                 ->join('users', 'users.id', '=', 'vagas.user_id')
                 ->join('tags', 'tags.id', '=', 'vagas.tag_id')
                 ->select('vagas.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
+                ->orderBy('vagas.created_at', 'asc')
                 ->get();
 
         return view('vagas', compact('vagas'));
@@ -70,6 +68,7 @@ class HomeController extends Controller
                 ->join('tags', 'tags.id', '=', 'vagas.tag_id')
                 ->select('vagas.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
                 ->where('user_id', Auth::user()->id)
+                ->orderBy('vagas.created_at', 'asc')
                 ->get();
 
             return view('perfilEmpresa', compact('empresa', 'vagas'));
@@ -83,12 +82,14 @@ class HomeController extends Controller
                 ->join('tags', 'tags.id', '=', 'postagems.tag_id')
                 ->select('postagems.*', 'users.name as usuario', 'users.email as email', 'users.username as username', 'tags.nome as tag')
                 ->where('user_id', Auth::user()->id)
+                ->orderBy('postagems.created_at', 'asc')
                 ->get();
 
             return view('perfilCidadao', compact('cidadao', 'perfil', 'posts'));
         }
     }
 
+    //Editar Perfil
     public function edit()
     {
         if(Auth::user()->funcao == "emp"){
@@ -121,13 +122,11 @@ class HomeController extends Controller
         }
 
         try{
-
-            DB::beginTransaction();
-
             $user = User::find(Auth::user()->id);
             $empresa = Empresa::find(Auth::user()->id);
             
             if(isset($user) && isset($empresa)) {
+                
                 $user->name = $request->input('name');
                 $user->telefone = $request->input('telefone');
                 $user->cep = $request->input('cep');
@@ -136,14 +135,14 @@ class HomeController extends Controller
                 $empresa->data_inauguracao = $request->input('data-inauguracao');
                 $empresa->data_chegada = $request->input('chegou-regiao');
 
+                DB::beginTransaction();
                 $user->save();
                 $empresa->save();
+                DB::commit();
             }
-            else{
+            else{             
                 return redirect("/perfil")->with('falha', "Perfil não encontrado")->withInput();
             }
-
-            DB::commit();
 
             return redirect("/perfil")->with('mensagem', "Perfil alterado com sucesso")->withInput();
 
@@ -178,13 +177,13 @@ class HomeController extends Controller
         }
 
         try{
-            DB::beginTransaction();
-
+            
             $user = User::find(Auth::user()->id);
             $cidadao = Cidadao::find(Auth::user()->id);
             $perfil = DB::table('perfil_profissionals')->where('user_id', Auth::user()->id)->first();
 
             if(isset($user) && isset($cidadao) && isset($perfil)) {
+               
                 $user->name = $request->input('name');
                 $user->telefone = $request->input('telefone');
                 $user->cep = $request->input('cep');
@@ -201,15 +200,17 @@ class HomeController extends Controller
                 $perfil->status = $request->input('status');
                 $perfil->data_chegada = $request->input('chegou-regiao');
 
+                DB::beginTransaction();
+
                 $user->save();
                 $cidadao->save();
                 $perfil->save();
+                
+                DB::commit();
             }
             else{
                 return redirect("/perfil")->with('falha', "Perfil não encontrado")->withInput();
             }
-
-            DB::commit();
 
             return redirect("/perfil")->with('mensagem', "Perfil alterado com sucesso")->withInput();
 
@@ -227,7 +228,6 @@ class HomeController extends Controller
 
     public function updateSenha(Request $request){
 
-
         $validator = Validator::make($request->all(), [
             'senha-atual' => ['required', 'string', 'min:8'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -239,20 +239,20 @@ class HomeController extends Controller
 
         if(Hash::check($request->input('senha-atual'), Auth::user()->password)){
             try{
-                DB::beginTransaction();
-
                 $user = User::find(Auth::user()->id);
 
                 if(isset($user)){
+                    DB::beginTransaction();
+
                     $user->password = Hash::make($request->input('password'));
                     $user->save();
+                    
+                    DB::commit();
                 }                
                 else{
                     return redirect("/perfil")->with('falha', "Usuário não encontrado")->withInput();
                 }
 
-                DB::commit();
-    
                 return redirect("/perfil")->with('mensagem', "Senha alterada com sucesso")->withInput();
     
             } catch(\Illuminate\Database\QueryException $e) {

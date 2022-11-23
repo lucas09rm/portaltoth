@@ -14,11 +14,11 @@ return new class extends Migration
             $table->string("texto", 800);
             $table->string("imagem")->nullable();
             $table->timestamps();
-            $table->unsignedBigInteger("user_id")->nullable();;
+            $table->unsignedBigInteger("user_id");
             $table->foreign("user_id")->references("id")->on("administradors");
             $table->unsignedBigInteger("tag_id");
             $table->foreign("tag_id")->references("id")->on("tags");
-            //imagem
+            
         });
     }
 

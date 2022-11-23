@@ -150,11 +150,10 @@
                     @else
                         <h6 class="text-uppercase mb-4 font-weight-bold text-primary">Usuário</h6>
                         <p><i class="fas fa-solid fa-user me-2"></i><a class="text-white" href="{{ route('perfil') }}" style="text-decoration: none">Perfil</a></p>
-                        <p><i class="fas fa-solid fa-square-plus me-2"></i><a class="text-white" href="{{ route('perfil') }}" style="text-decoration: none">Postar</a></p>
+                        <p><i class="fas fa-solid fa-square-plus me-2"></i><a class="text-white" href="@if(Auth::user()->funcao == 'cid') {{ route('feed.createPost') }}  @elseif (Auth::user()->funcao == 'emp') {{ route('feed.createVaga') }} @endif" style="text-decoration: none">Postar</a></p>
                     @endguest                    
                 </div>
                 <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3"> 
-                    
                     <p>Copyright &copy; All rights reserved by:</p>
                     <p><a class="text-white" href="" style="text-decoration: none"><strong class="text-primary">Portal Toth &copy; {{ date("Y") }}</strong></a></p>
                     
